@@ -1,0 +1,44 @@
+{
+  "v": 1,
+  "type": "dataset",
+  "role": "course",
+  "answers": {
+    "id": "synthetische-lagerampel-beispiele",
+    "title": "Synthetische Beispieldaten für eine Lagerbestands-Ampel",
+    "category": "operations",
+    "language": "de",
+    "maintainer": "ap14-test-user",
+    "license": "CC0-1.0",
+    "license_status": "declared",
+    "data_risk": "green",
+    "ai_act_proximity": "none",
+    "sources_status": "not_required",
+    "linked_artifacts": [],
+    "data_origin": "synthetic",
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "sources_date": "2026-09-14",
+    "usage_scope": "Ausschließlich Demonstration, Unterricht und technische Tests einer einfachen Bestandsklassifikation.",
+    "release_asset_required": false,
+    "release_asset_name": "",
+    "release_asset_version": "",
+    "release_asset_size_mb": "",
+    "release_asset_sha256": "",
+    "release_asset_url": "",
+    "dataset_description": "Das Paket beschreibt zwölf frei erfundene Artikel mit synthetischen Beständen, Meldebeständen und Lieferzeiten. Es enthält keine Angaben aus einem realen Unternehmen.",
+    "scenario_positive": "Positiv: Bestand und Meldebestand sind vorhanden; die Ampelfarbe lässt sich deterministisch ableiten.",
+    "scenario_rework": "Nachbearbeitbar: Eine synthetische Lieferzeit fehlt. Der Datensatz markiert den Wert als unbekannt und verlangt Ergänzung.",
+    "scenario_negative": "Negativ: Exportierte Lagerdaten eines realen Betriebs oder Lieferantendaten werden nicht aufgenommen.",
+    "failure_modes": [
+      "Synthetische Werte werden versehentlich als reale Kennzahlen dargestellt",
+      "Fehlende Werte werden still mit null ersetzt",
+      "Einheiten werden vermischt"
+    ],
+    "sources": []
+  },
+  "acknowledgements": {
+    "public_content_confirmed": true,
+    "no_real_personal_data_confirmed": true,
+    "pii_hints_reviewed": true
+  }
+}

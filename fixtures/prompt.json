@@ -1,0 +1,46 @@
+{
+  "v": 1,
+  "type": "prompt",
+  "role": "external",
+  "answers": {
+    "id": "synthetische-kundenanfrage-sortieren",
+    "title": "Synthetische Kundenanfragen für ein kleines Serviceteam sortieren",
+    "category": "customer_service",
+    "language": "de",
+    "maintainer": "ap14-test-user",
+    "license": "CC-BY-4.0",
+    "license_status": "declared",
+    "data_risk": "green",
+    "ai_act_proximity": "none",
+    "sources_status": "not_required",
+    "target_users": [
+      "Mitarbeitende kleiner Serviceteams ohne Programmierkenntnisse"
+    ],
+    "use_case": "Frei erfundene Kundenanfragen nach Thema und Dringlichkeit vorsortieren, ohne Entscheidungen über reale Personen zu treffen.",
+    "required_inputs": [
+      "Eine vollständig synthetische Anfrage",
+      "Eine Liste der erlaubten Themenkategorien"
+    ],
+    "output_format": "Markdown-Tabelle mit Kategorie, Dringlichkeit, Begründung und Rückfragebedarf",
+    "personal_data_possible": false,
+    "evaluation_criteria": "Alle Ausgaben müssen nachvollziehbar sein, Unsicherheit kennzeichnen und dürfen keine echte Priorisierungsentscheidung vortäuschen.",
+    "prompt_text": "Du unterstützt ein kleines Serviceteam. Analysiere ausschließlich den folgenden synthetischen Beispieltext. Ordne ihn einer erlaubten Kategorie zu, schlage eine Dringlichkeit vor und erkläre knapp deine Unsicherheit. Erfinde keine personenbezogenen Angaben. Wenn Informationen fehlen, schreibe `Rückfrage nötig`.\n\nAusgabeformat:\n```markdown\n| Kategorie | Dringlichkeit | Begründung | Rückfrage |\n|---|---|---|---|\n```",
+    "sample_input": "Die Testkundin schreibt: Unsere erfundene Modellmaschine TOM-42 zeigt seit heute die Meldung #A17. Der Betrieb läuft weiter, aber langsamer. Kategorien: Störung, Bedienfrage, Rechnung.",
+    "sample_output": "| Kategorie | Dringlichkeit | Begründung | Rückfrage |\n|---|---|---|---|\n| Störung | mittel | Leistung ist reduziert, ein vollständiger Ausfall liegt im synthetischen Fall nicht vor. | Welche Auswirkungen hat #A17 laut Testhandbuch? |",
+    "scenario_positive": "Positiv: Die Anfrage enthält eine klare synthetische Fehlermeldung und erlaubte Kategorien. Die Ausgabe ist nachvollziehbar und als Vorschlag markiert.",
+    "scenario_rework": "Nachbearbeitbar: Die Anfrage nennt keine Auswirkungen. Das System kennzeichnet Unsicherheit und verlangt eine Rückfrage, statt Dringlichkeit zu erfinden.",
+    "scenario_negative": "Negativ: Eine Anfrage enthält echte Kunden- oder Kontaktdaten. Der Prompt darf dafür nicht verwendet werden; der Inhalt muss vorab entfernt oder synthetisch ersetzt werden.",
+    "failure_modes": [
+      "Erfundene Kategorien",
+      "Unbegründete hohe Dringlichkeit",
+      "Übernahme realer Kontaktdaten",
+      "Ausgabe ohne Unsicherheitskennzeichnung"
+    ],
+    "sources": []
+  },
+  "acknowledgements": {
+    "public_content_confirmed": true,
+    "no_real_personal_data_confirmed": true,
+    "pii_hints_reviewed": true
+  }
+}

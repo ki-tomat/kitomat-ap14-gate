@@ -1,0 +1,52 @@
+{
+  "v": 1,
+  "type": "industry",
+  "role": "external",
+  "answers": {
+    "id": "baeckerei-auftragsklaerung-modell",
+    "title": "Orientierungsmodell für die synthetische Auftragsklärung einer kleinen Bäckerei",
+    "category": "kmu_branchenmodell",
+    "language": "de",
+    "maintainer": "ap14-test-user",
+    "license": "CC-BY-4.0",
+    "license_status": "declared",
+    "data_risk": "green",
+    "ai_act_proximity": "none",
+    "sources_status": "not_required",
+    "model_type": "worksheet",
+    "target_users": [
+      "Kleine Bäckereibetriebe, die einen KI-gestützten Ablauf zunächst mit erfundenen Fällen erproben"
+    ],
+    "use_case": "Ein Workshop-Modell zur strukturierten Klärung frei erfundener Bestellanfragen, bevor ein Mensch die Anfrage fachlich bewertet.",
+    "required_inputs": [
+      "Synthetische Produktanfrage",
+      "Frei erfundene Lieferbedingungen",
+      "Liste erlaubter Rückfragen"
+    ],
+    "output_format": "Ausgefülltes Worksheet mit bekannten Angaben, Lücken, Rückfragen, Grenzen und menschlichem Entscheidungspunkt",
+    "application_scope": "Workshop, Vorprüfung und Orientierung; keine produktive Bestellannahme",
+    "framework_references": [
+      "KItomat-Szenario-Triade",
+      "Human-in-the-loop-Prinzip"
+    ],
+    "required_review_level": "trust_review",
+    "model_description": "Das Modell trennt bekannte Angaben, fehlende Angaben und menschliche Entscheidungen. Es verarbeitet nur synthetische Übungsfälle und erzeugt keine verbindliche Auftragsbestätigung.",
+    "application_guide": "Workshop-Teilnehmende tragen einen erfundenen Fall ein, markieren Unsicherheiten und formulieren Rückfragen. Anschließend prüft eine fachkundige Person, welche Schritte überhaupt automatisierbar wären.",
+    "sample_case": "Eine fiktive Kundschaft fragt 80 Tomatenbrötchen 🍅 für Freitag an. Lieferadresse und Allergieangaben fehlen absichtlich. Das Modell darf nur Rückfragen formulieren.",
+    "scenario_positive": "Positiv: Alle synthetischen Kerndaten sind vorhanden und das Modell übergibt eine strukturierte Übersicht an einen Menschen.",
+    "scenario_rework": "Nachbearbeitbar: Lieferzeit oder Produktvariante fehlen. Das Modell fragt nach und trifft keine Annahme.",
+    "scenario_negative": "Negativ: Reale Kontakt-, Gesundheits- oder Zahlungsdaten werden eingegeben. Der Fall wird nicht weiterverarbeitet.",
+    "failure_modes": [
+      "Verbindliche Zusage ohne menschliche Prüfung",
+      "Erfundene Lieferbedingungen",
+      "Verarbeitung realer Kontaktdaten",
+      "Gesundheitsbezogene Empfehlung bei Allergieangaben"
+    ],
+    "sources": []
+  },
+  "acknowledgements": {
+    "public_content_confirmed": true,
+    "no_real_personal_data_confirmed": true,
+    "pii_hints_reviewed": true
+  }
+}
