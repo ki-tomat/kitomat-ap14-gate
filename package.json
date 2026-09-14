@@ -1,0 +1,13 @@
+{
+  "name": "kitomat-ap14-gate",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "measure": "node scripts/measure-payloads.mjs",
+    "test": "node test/payload-codec.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

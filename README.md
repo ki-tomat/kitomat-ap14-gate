@@ -2,7 +2,7 @@
 
 Temporäres, öffentliches Test-Repository für das technische Go/No-Go-Gate von AP14 (Beitrag vorbereiten).
 
-**Status:** Remote angelegt; AP14.0-Unterlagen lokal vorbereitet; noch kein Workflow- oder Produktivcode.
+**Status:** AP14.0-Baseline veröffentlicht; lokales Codec- und Mess-Gate bestanden; noch kein GitHub-Workflow oder Produktivcode.
 
 ## Zweck
 
@@ -35,6 +35,17 @@ Payload → Clipboard/Issue → Maintainer-Label → GitHub Action
 
 Remote-Pushes, Pull Requests, Freigaben und Merges erfolgen nur nach ausdrücklichem menschlichem Go.
 
+## Lokale Prüfung
+
+Voraussetzung ist Node.js 20 oder neuer. Der Prototyp verwendet keine externen Laufzeit-Abhängigkeiten.
+
+```bash
+npm test
+npm run measure
+```
+
+Der Codec validiert die feste Payload-Hülle, die typspezifischen Feldlisten, Datentypen, Bestätigungen, Marker, Base64, UTF-8 und die vorläufige 32-KiB-Grenze. SHA-256 wird über die exakt dekodierten Payload-Bytes berechnet.
+
 ## Nächster Schritt
 
-Die lokalen Fixtures vermessen und daraus kleine, wegwerfbare Prototypen für Codec, Generator und Import-Workflow ableiten. Produktiver AP14-Code entsteht erst nach bestandenem Gate.
+Nach bestandenem lokalen Codec-Gate folgt ein wegwerfbarer Generator-Prototyp. Ein GitHub-Import-Workflow und produktiver AP14-Code entstehen erst in späteren, separat freigegebenen Schritten.

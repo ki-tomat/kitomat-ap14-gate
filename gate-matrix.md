@@ -6,11 +6,11 @@ Für jede Fixture werden protokolliert:
 
 | Typ | JSON UTF-8 | Base64 | Zusammenfassung | Issue-Body | vollständige URL | URL zulässig? |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| Prompt | 2.730 B | 3.640 Zeichen | 154 Zeichen | 3.850 Zeichen | 4.053 Zeichen | nein |
+| Prompt | 2.730 B | 3.640 Zeichen | 154 Zeichen | 3.850 Zeichen | 4.051 Zeichen | nein |
 | Dataset | 1.660 B | 2.216 Zeichen | 140 Zeichen | 2.412 Zeichen | 2.607 Zeichen | nein |
 | Branchenmodell | 2.487 B | 3.316 Zeichen | 167 Zeichen | 3.539 Zeichen | 3.776 Zeichen | nein |
 
-Messstand: 14. September 2026. Das JSON wurde nach dem Einlesen mit `JSON.stringify` deterministisch ohne Einrückung serialisiert und anschließend als UTF-8 nach Base64 kodiert. Die Issue-Zusammenfassung enthält Titel, Typ, Rolle und ID; die URL enthält den URL-kodierten Titel und den vollständigen Issue-Body.
+Messstand: 14. September 2026. Das JSON wurde nach dem Einlesen mit lexikografisch sortierten Objektschlüsseln kanonisch ohne Einrückung serialisiert und anschließend als UTF-8 nach Base64 kodiert. Die Issue-Zusammenfassung enthält Titel, Typ, Rolle und ID; die URL enthält den URL-kodierten Titel und den vollständigen Issue-Body.
 
 **Ergebnis:** Bereits alle drei realistischen Fixtures überschreiten die vorläufige URL-Grenze von 1.500 Zeichen. Der Standardtransport für Weg A ist daher **Clipboard plus manuelles Einfügen in den Issue-Body**. Eine vorausgefüllte URL darf nur für nachweislich kleinere Payloads angeboten werden.
 
@@ -34,6 +34,8 @@ Zusätzlich werden Grenzfälle knapp unter und über 32 KiB Payload sowie 55.000
 | unbekanntes Antwortfeld | Ablehnung |
 | falscher Datentyp | Ablehnung |
 | Payload über 32 KiB | Ablehnung vor Generierung |
+
+Lokaler Prüfstand vom 14. September 2026: **24/24 automatisierte Codec-Tests bestanden**. Abgedeckt sind die drei Fixture-Roundtrips, Unicode und Zeilenenden, kurze und zu lange Pre-fill-URLs, Marker-, Base64-, UTF-8-, JSON-, Versions-, Feld-, Typ- und Bestätigungsfehler sowie die Grenzwerte 32 KiB und 55.000 Zeichen jeweils direkt an und über der Grenze. Generator- und Pfadangriffe bleiben bis zum nächsten Gate-Schritt offen.
 
 ## C. Browser- und Clipboard-Matrix
 
