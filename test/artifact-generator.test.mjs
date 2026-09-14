@@ -16,6 +16,7 @@ import {
 
 const testDirectory = path.dirname(fileURLToPath(import.meta.url));
 const fixtureDirectory = path.resolve(testDirectory, "..", "fixtures");
+const validatorDirectory = path.resolve(testDirectory, "..", "tools", "validators");
 const execFileAsync = promisify(execFile);
 
 const EXPECTED_FILES = Object.freeze({
@@ -159,6 +160,36 @@ test("YAML bleibt mit #, Doppelpunkten, Quotes, Umlauten, Listen, Booleans und L
     assert.deepEqual(metadata.linked_artifacts, payload.answers.linked_artifacts);
     assert.equal(metadata.release_asset_required, false);
     assert.equal(metadata.release_asset_name, "");
+  });
+});
+
+test("alle drei Fixtures bestehen die lokalen Workflow-Validatoren", async () => {
+  await withTemporaryRepositories(async (repositoryRoot) => {
+    for (const fixtureName of ["prompt", "dataset", "industry"]) {
+      await generateArtifact(await loadFixture(fixtureName), { repositoryRoot });
+    }
+
+    const environment = {
+      ...process.env,
+      KITOMAT_REPOSITORY_ROOT: repositoryRoot
+    };
+    const results = [];
+    for (const scriptName of [
+      "validate_metadata.py",
+      "validate_completeness.py",
+      "pii_heuristic.py"
+    ]) {
+      results.push(
+        await execFileAsync("python3", [path.join(validatorDirectory, scriptName)], {
+          encoding: "utf8",
+          env: environment
+        })
+      );
+    }
+
+    assert.match(results[0].stdout, /passed for 3 files/);
+    assert.match(results[1].stdout, /passed for 3 artifact dirs/);
+    assert.match(results[2].stdout, /passed without warnings/);
   });
 });
 

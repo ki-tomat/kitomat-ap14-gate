@@ -6,6 +6,7 @@
   "scripts": {
     "generate:fixture": "node scripts/generate-fixture.mjs",
     "measure": "node scripts/measure-payloads.mjs",
+    "prepare:import": "node scripts/prepare-import.mjs",
     "test": "node test/run-tests.mjs"
   },
   "engines": {

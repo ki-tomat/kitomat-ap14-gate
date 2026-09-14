@@ -1,0 +1,161 @@
+name: webui-import
+
+on:
+  issues:
+    types:
+      - labeled
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: webui-import-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  import:
+    name: webui-import
+    if: github.event.label.name == 'webui-import'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Repository auf main auschecken
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Berechtigung des Label-Akteurs prüfen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL_ACTOR: ${{ github.actor }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          role="$(gh api "repos/${REPOSITORY}/collaborators/${LABEL_ACTOR}/permission" --jq '.role_name // .permission')"
+          case "$role" in
+            admin|maintain|write|triage)
+              printf 'Label-Akteur @%s ist mit %s berechtigt.\n' "$LABEL_ACTOR" "$role"
+              ;;
+            *)
+              printf 'Import abgebrochen: unzureichende Berechtigung für @%s.\n' "$LABEL_ACTOR" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Node-Abhängigkeiten installieren
+        run: npm ci
+
+      - name: JavaScript-Tests ausführen
+        run: npm test
+
+      - name: Import sicher vorbereiten
+        id: prepare
+        run: node scripts/prepare-import.mjs
+
+      - name: Vorhandene Import-Branch-Familie ausschließen
+        env:
+          BRANCH_FAMILY: ${{ steps.prepare.outputs.branch_family }}
+        run: |
+          existing="$(git ls-remote --heads origin "refs/heads/${BRANCH_FAMILY}*")"
+          if [[ -n "$existing" ]]; then
+            printf 'Import abgebrochen: Für diese Artefakt-ID existiert bereits eine Import-Branch.\n' >&2
+            exit 1
+          fi
+
+      - name: Validator-Fallback testen
+        run: python3 -m unittest discover -s tools/validators -p 'test_*.py' -v
+
+      - name: Generierte Metadaten validieren
+        run: python3 tools/validators/validate_metadata.py
+
+      - name: Generierte Vollständigkeit validieren
+        run: python3 tools/validators/validate_completeness.py
+
+      - name: Generierte Inhalte auf PII-Hinweise prüfen
+        run: python3 tools/validators/pii_heuristic.py
+
+      - name: Ausschließlich das generierte Artefakt committen
+        env:
+          ARTIFACT_ID: ${{ steps.prepare.outputs.artifact_id }}
+          ARTIFACT_PATH: ${{ steps.prepare.outputs.artifact_path }}
+          BRANCH: ${{ steps.prepare.outputs.branch }}
+          ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch --create "$BRANCH"
+          git add -- "$ARTIFACT_PATH"
+
+          if git diff --cached --quiet; then
+            printf 'Import abgebrochen: Keine Artefaktdateien zum Committen gefunden.\n' >&2
+            exit 1
+          fi
+
+          while IFS= read -r changed_path; do
+            case "$changed_path" in
+              "$ARTIFACT_PATH"/*) ;;
+              *)
+                printf 'Import abgebrochen: Unerwarteter Staging-Pfad %s.\n' "$changed_path" >&2
+                exit 1
+                ;;
+            esac
+          done < <(git diff --cached --name-only)
+
+          git commit -m "Add AP14 artifact ${ARTIFACT_ID} (#${ISSUE_NUMBER})"
+          git push --set-upstream origin "$BRANCH"
+
+      - name: Pull Request ohne automatische Freigabe erstellen
+        id: pull_request
+        env:
+          BRANCH: ${{ steps.prepare.outputs.branch }}
+          DATA_RISK: ${{ steps.prepare.outputs.data_risk }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY_PATH: ${{ steps.prepare.outputs.pr_body_path }}
+          PR_TITLE: ${{ steps.prepare.outputs.pr_title }}
+        run: |
+          pr_url="$(gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "$PR_TITLE" \
+            --body-file "$PR_BODY_PATH" \
+            --label artifact \
+            --label needs-review \
+            --label "risk_${DATA_RISK}")"
+
+          if [[ ! "$pr_url" =~ ^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[0-9]+$ ]]; then
+            printf 'Pull-Request-URL hat ein unerwartetes Format.\n' >&2
+            exit 1
+          fi
+          printf 'url=%s\n' "$pr_url" >> "$GITHUB_OUTPUT"
+
+      - name: Issue mit dem Pull Request verknüpfen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
+          PR_URL: ${{ steps.pull_request.outputs.url }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body "Der AP14-Beitrag wurde als Pull Request vorbereitet: ${PR_URL}"
+
+      - name: Sicheren Abbruch im Issue melden
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          SERVER_URL: ${{ github.server_url }}
+        run: |
+          case "$ISSUE_NUMBER" in
+            ''|*[!0-9]*) exit 0 ;;
+          esac
+          run_url="${SERVER_URL}/${REPOSITORY}/actions/runs/${RUN_ID}"
+          gh issue comment "$ISSUE_NUMBER" --body "Der AP14-Import wurde sicher abgebrochen. Es wurde keine automatische Freigabe oder Zusammenführung durchgeführt. Details: ${run_url}"

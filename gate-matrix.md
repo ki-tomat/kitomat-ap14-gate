@@ -95,7 +95,7 @@ Bei verweigertem Clipboard-Zugriff muss ein auswählbares Textfeld mit manueller
 
 Jeder Negativfall muss mit verständlichem Issue-Kommentar enden und darf keinen Commit erzeugen.
 
-Lokaler Generator-Prüfstand vom 14. September 2026: 50/50 Tests bestanden. Pfad-Traversal, absolute Pfade, `.github` als Ziel, überlange und platzhalterhaltige IDs, `pXX`, manipuliertes `data_risk`, Steuerzeichen, symbolische Zielwurzeln sowie globale und parallele ID-Kollisionen werden abgewiesen. Shell-Zeichen und `${{ ... }}` bleiben reiner Dateiinhalt. Die drei Fixture-Ausgaben umfassen exakt 7/5/7 Dateien, sind bytegenau deterministisch, verwenden ausschließlich LF und bestehen die KItomat-Validatoren für Metadaten und Vollständigkeit. Workflow-Kommentare, Branch-Zuordnung und die Prüfung „kein Commit“ bleiben bis zum GitHub-Workflow-Gate offen.
+Lokaler Workflow-Prüfstand vom 14. September 2026: 64/64 JavaScript- und 5/5 Python-Tests bestanden. Pfad-Traversal, absolute Pfade, `.github` als Ziel, überlange und platzhalterhaltige IDs, `pXX`, manipuliertes `data_risk`, Steuerzeichen, symbolische Zielwurzeln sowie globale und parallele ID-Kollisionen werden abgewiesen. Shell-Zeichen und `${{ ... }}` bleiben reiner Dateiinhalt. Die drei Fixture-Ausgaben umfassen exakt 7/5/7 Dateien, sind bytegenau deterministisch, verwenden ausschließlich LF und bestehen gemeinsam die Validatoren für Metadaten, Vollständigkeit und PII-Hinweise. Importplan und Dateisystem-Vorbereitung sind lokal geprüft; Workflow-Kommentare, GitHub-Berechtigungen, Branch-Push und Pull-Request-Zuordnung bleiben bis zum Live-Gate offen.
 
 ## G. Repository-Einstellungen
 
