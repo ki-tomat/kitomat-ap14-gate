@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "generate:fixture": "node scripts/generate-fixture.mjs",
     "measure": "node scripts/measure-payloads.mjs",
-    "test": "node test/payload-codec.test.mjs"
+    "test": "node test/run-tests.mjs"
   },
   "engines": {
     "node": ">=20"
