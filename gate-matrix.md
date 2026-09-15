@@ -35,7 +35,7 @@ Zusätzlich werden Grenzfälle knapp unter und über 32 KiB Payload sowie 55.000
 | falscher Datentyp | Ablehnung |
 | Payload über 32 KiB | Ablehnung vor Generierung |
 
-Lokaler Prüfstand vom 14. September 2026: **24/24 automatisierte Codec-Tests bestanden**. Abgedeckt sind die drei Fixture-Roundtrips, Unicode und Zeilenenden, kurze und zu lange Pre-fill-URLs, Marker-, Base64-, UTF-8-, JSON-, Versions-, Feld-, Typ- und Bestätigungsfehler sowie die Grenzwerte 32 KiB und 55.000 Zeichen jeweils direkt an und über der Grenze. Generator- und Pfadangriffe bleiben bis zum nächsten Gate-Schritt offen.
+Lokaler Prüfstand vom 14. September 2026: **24/24 automatisierte Codec-Tests bestanden**. Abgedeckt sind die drei Fixture-Roundtrips, Unicode und Zeilenenden, kurze und zu lange Pre-fill-URLs, Marker-, Base64-, UTF-8-, JSON-, Versions-, Feld-, Typ- und Bestätigungsfehler sowie die Grenzwerte 32 KiB und 55.000 Zeichen jeweils direkt an und über der Grenze. Generator- und Pfadangriffe werden in Abschnitt F behandelt; der erste Live-Pfadangriff ist dort inzwischen fail-closed belegt.
 
 ## C. Browser- und Clipboard-Matrix
 
@@ -63,7 +63,20 @@ Bei verweigertem Clipboard-Zugriff muss ein auswählbares Textfeld mit manueller
 12. `validate` wird grün.
 13. Pull Request wäre nach menschlicher Freigabe regulär mergebar.
 
+**Live-Ergebnis vom 15. September 2026: bestanden.** Das öffentliche synthetische Issue [#1](https://github.com/ki-tomat/kitomat-ap14-gate/issues/1) wurde von `@solvity` mit `webui-import` gelabelt. Der Importlauf [#34940100849](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34940100849) war nach 17 Sekunden erfolgreich und erzeugte:
+
+- Branch `prompt/synthetische-kundenanfrage-sortieren-i1`,
+- Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`,
+- exakt sieben Dateien unter `prompts/synthetische-kundenanfrage-sortieren/`,
+- Pull Request [#2](https://github.com/ki-tomat/kitomat-ap14-gate/pull/2) mit `artifact`, `needs-review` und `risk_green`,
+- die Rückverknüpfung und den vorgesehenen Kommentar im Issue,
+- den korrekten Payload-Hash `ccbb17f25365a8f18348677abd60a69af3468ddee2cf2bfcc2e8b0a8e0788907`.
+
+GitHub hielt den ersten `validate`-Lauf für den erstmalig beitragenden `github-actions[bot]` zunächst mit `Action required` zurück. Nach der vorgesehenen Maintainer-Freigabe lief [Validate #34940119833](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34940119833) in 16 Sekunden erfolgreich. Der Pull Request blieb anschließend erwartungsgemäß `Awaiting approval`, weil mindestens eine menschliche Review-Freigabe fehlt. Es wurde nichts gemergt.
+
 ## E. Idempotenz und Zustände
+
+Die folgenden Erwartungen beschreiben das Zielverhalten für ein späteres `WEG_A_GO`. Der aktuelle Prototyp blockiert Wiederholungen und ID-Kollisionen zunächst bewusst fail-closed, sobald bereits eine Import-Branch derselben Typ-/ID-Familie vorhanden ist.
 
 | Fall | Erwartung |
 | --- | --- |
@@ -75,6 +88,14 @@ Bei verweigertem Clipboard-Zugriff muss ein auswählbares Textfeld mit manueller
 | Zugeordneter PR geschlossen | keine automatische Wiederöffnung |
 | Zugeordneter PR gemergt | kein Wiederanlauf |
 | Parallele Läufe desselben Issues | durch Concurrency serialisiert |
+
+**Live-Ergebnis des ersten Wiederholungstests vom 15. September 2026: fail-closed bestanden.** Am unveränderten synthetischen Issue [#1](https://github.com/ki-tomat/kitomat-ap14-gate/issues/1) wurde das Label `webui-import` entfernt und bei identischem Payload sowie identischem Hash erneut gesetzt. Der zweite Importlauf [#34943076046](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34943076046) stoppte erwartungsgemäß im Schritt „Vorhandene Import-Branch-Familie ausschließen“ mit dem Hinweis, dass für diese Artefakt-ID bereits eine Import-Branch existiert.
+
+Die nachfolgenden Schritte für Validatoren, Commit, Pull-Request-Erstellung und Issue-Verknüpfung wurden übersprungen. Der Workflow hinterließ im Issue ausschließlich den generischen sicheren Abbruchkommentar mit Lauf-Link. Es entstand kein zusätzlicher Branch, Commit oder Pull Request: Pull Request [#2](https://github.com/ki-tomat/kitomat-ap14-gate/pull/2) enthielt danach weiterhin genau den ursprünglichen Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`; im Repository blieben insgesamt die zwei bereits vorhandenen offenen Pull Requests #2 und #3 bestehen.
+
+**Live-Ergebnis des ID-Kollisionstests vom 15. September 2026: fail-closed bestanden.** Das neue synthetische Issue [#4](https://github.com/ki-tomat/kitomat-ap14-gate/issues/4) enthielt denselben Prompt-Payload, dieselbe Artefakt-ID `synthetische-kundenanfrage-sortieren` und denselben Payload-Hash wie Issue #1. Nach der Maintainer-Labelvergabe stoppte Lauf [#34945425451](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34945425451) nach 13 Sekunden ebenfalls im Schritt „Vorhandene Import-Branch-Familie ausschließen“ mit der Meldung `Import abgebrochen: Für diese Artefakt-ID existiert bereits eine Import-Branch.`
+
+Die nachfolgenden Validator-, Commit-, Pull-Request- und Issue-Verknüpfungsschritte wurden übersprungen; der sichere Standardkommentar verlinkte den Lauf in Issue #4. Der Remote-Bestand blieb bei genau drei Branches (`main`, `docs/ap14-live-happy-path` und `prompt/synthetische-kundenanfrage-sortieren-i1`) sowie zwei offenen Pull Requests. Insbesondere entstand keine Branch mit Issue-Nummer 4, und Pull Request #2 enthielt weiterhin nur Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`.
 
 ## F. Angriffsmatrix
 
@@ -94,6 +115,10 @@ Bei verweigertem Clipboard-Zugriff muss ein auswählbares Textfeld mit manueller
 | fremde Branch-Zuordnung | nicht verändern |
 
 Jeder Negativfall muss mit verständlichem Issue-Kommentar enden und darf keinen Commit erzeugen.
+
+**Live-Ergebnis des Pfadangriffstests vom 15. September 2026: fail-closed bestanden.** Das synthetische Issue [#5](https://github.com/ki-tomat/kitomat-ap14-gate/issues/5) enthielt im Payload die manipulierte Artefakt-ID `../../.github/workflows/x.yml` mit dem Payload-Hash `9d4c58bf1c51e63ce6f9d469ce6e139f5f531ab0d39de1c037481b69320a2623`. Lauf [#34948664732](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34948664732) stoppte nach 11 Sekunden im Schritt „Import sicher vorbereiten“ mit `INVALID_ID: Artefakt-ID muss ein kleingeschriebener, maximal 80 Zeichen langer Slug sein.`
+
+Alle folgenden Schritte für Branch-Familienprüfung, Validatoren, Commit, Pull-Request-Erstellung und Issue-Verknüpfung wurden übersprungen. Issue #5 erhielt ausschließlich den generischen sicheren Abbruchkommentar mit Lauf-Link. Der Remote-Bestand blieb bei den drei bekannten Branches, zwei offenen Pull Requests und dem unveränderten Einzelcommit `dc820e499945e2c30d5576f5210b512a3cb283e4` in Pull Request #2; insbesondere wurde weder unter `.github/` noch an einem anderen Ziel geschrieben.
 
 Lokaler Workflow-Prüfstand vom 14. September 2026: 64/64 JavaScript- und 5/5 Python-Tests bestanden. Pfad-Traversal, absolute Pfade, `.github` als Ziel, überlange und platzhalterhaltige IDs, `pXX`, manipuliertes `data_risk`, Steuerzeichen, symbolische Zielwurzeln sowie globale und parallele ID-Kollisionen werden abgewiesen. Shell-Zeichen und `${{ ... }}` bleiben reiner Dateiinhalt. Die drei Fixture-Ausgaben umfassen exakt 7/5/7 Dateien, sind bytegenau deterministisch, verwenden ausschließlich LF und bestehen gemeinsam die Validatoren für Metadaten, Vollständigkeit und PII-Hinweise. Importplan und Dateisystem-Vorbereitung sind lokal geprüft; Workflow-Kommentare, GitHub-Berechtigungen, Branch-Push und Pull-Request-Zuordnung bleiben bis zum Live-Gate offen.
 
