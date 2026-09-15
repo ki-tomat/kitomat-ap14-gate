@@ -2,7 +2,7 @@
 
 ## Zweck und Status
 
-Der Workflow-Prototyp übersetzt genau ein von einem Maintainer gelabeltes GitHub-Issue in einen neuen Artefakt-Branch und einen Pull Request. Der Code ist lokal geprüft, aber noch nicht im GitHub-Repository ausgeführt. Bis der Live-Happy-Path und die Negativfälle belegt sind, ist dies **kein produktiver Importweg**.
+Der Workflow-Prototyp übersetzt genau ein von einem Maintainer gelabeltes GitHub-Issue in einen neuen Artefakt-Branch und einen Pull Request. Der Code ist lokal geprüft; der synthetische Live-Happy-Path wurde am 15. September 2026 im Gate-Repository bestanden. Bis auch die vorgesehenen Negativ-, Kollisions- und Wiederholungsfälle belegt sind, ist dies **kein produktiver Importweg**.
 
 ## Auslöser und Vertrauensgrenzen
 
@@ -47,13 +47,15 @@ Vor jedem Commit laufen:
 
 Der lokale YAML-Fallback dieses Gates liest die vom Generator verwendeten JSON-quotierten YAML-Skalare verlustfrei. Damit ist insbesondere das bekannte `#`-Problem des derzeitigen Produkt-Validators im Gate behoben; vor einer Produktivübernahme muss dieselbe Korrektur bewusst in `ki-tomat/kitomat` übernommen und geprüft werden.
 
+## Nachgewiesener Live-Happy-Path
+
+Am 15. September 2026 wurde Issue [#1](https://github.com/ki-tomat/kitomat-ap14-gate/issues/1) mit dem synthetischen Prompt-Payload und dem Label `webui-import` verarbeitet. Der Importlauf [#34940100849](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34940100849) erzeugte den Branch `prompt/synthetische-kundenanfrage-sortieren-i1`, sieben Dateien und Pull Request [#2](https://github.com/ki-tomat/kitomat-ap14-gate/pull/2). Der dokumentierte Payload-Hash ist `ccbb17f25365a8f18348677abd60a69af3468ddee2cf2bfcc2e8b0a8e0788907`.
+
+Der `validate`-Lauf [#34940119833](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34940119833) verlangte wegen des erstmalig beitragenden `github-actions[bot]` zunächst die vorgesehene Maintainer-Freigabe und lief danach erfolgreich. Der Branch-Schutz hielt den offenen Pull Request trotz grünem Check ohne die verlangte menschliche Review-Freigabe zurück. Es erfolgte kein Merge.
+
 ## Noch offene Live-Voraussetzungen
 
-- GitHub Actions müssen aktiviert sein.
-- Actions müssen Pull Requests erstellen dürfen.
-- Die Labels `webui-import`, `artifact`, `needs-review`, `risk_green`, `risk_yellow` und `risk_red` müssen existieren.
-- Der Branch-Schutz für `main` muss den Check `validate` und mindestens eine menschliche Freigabe verlangen.
-- Der erste synthetische Happy-Path und die vorgesehenen Negativfälle müssen protokolliert werden.
+- Die vorgesehenen Negativ-, Kollisions- und Wiederholungsfälle müssen protokolliert werden.
 - Verhalten nach einem Fehler zwischen Branch-Push und PR-Erstellung muss live geprüft werden; der erneute Lauf bleibt bis dahin fail-closed.
 
 Fehlgeschlagene Läufe schreiben einen generischen Issue-Kommentar mit Link zum Workflow-Lauf. Details aus Nutzereingaben werden darin nicht wiederholt.

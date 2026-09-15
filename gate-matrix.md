@@ -63,6 +63,17 @@ Bei verweigertem Clipboard-Zugriff muss ein auswählbares Textfeld mit manueller
 12. `validate` wird grün.
 13. Pull Request wäre nach menschlicher Freigabe regulär mergebar.
 
+**Live-Ergebnis vom 15. September 2026: bestanden.** Das öffentliche synthetische Issue [#1](https://github.com/ki-tomat/kitomat-ap14-gate/issues/1) wurde von `@solvity` mit `webui-import` gelabelt. Der Importlauf [#34940100849](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34940100849) war nach 17 Sekunden erfolgreich und erzeugte:
+
+- Branch `prompt/synthetische-kundenanfrage-sortieren-i1`,
+- Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`,
+- exakt sieben Dateien unter `prompts/synthetische-kundenanfrage-sortieren/`,
+- Pull Request [#2](https://github.com/ki-tomat/kitomat-ap14-gate/pull/2) mit `artifact`, `needs-review` und `risk_green`,
+- die Rückverknüpfung und den vorgesehenen Kommentar im Issue,
+- den korrekten Payload-Hash `ccbb17f25365a8f18348677abd60a69af3468ddee2cf2bfcc2e8b0a8e0788907`.
+
+GitHub hielt den ersten `validate`-Lauf für den erstmalig beitragenden `github-actions[bot]` zunächst mit `Action required` zurück. Nach der vorgesehenen Maintainer-Freigabe lief [Validate #34940119833](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34940119833) in 16 Sekunden erfolgreich. Der Pull Request blieb anschließend erwartungsgemäß `Awaiting approval`, weil mindestens eine menschliche Review-Freigabe fehlt. Es wurde nichts gemergt.
+
 ## E. Idempotenz und Zustände
 
 | Fall | Erwartung |
