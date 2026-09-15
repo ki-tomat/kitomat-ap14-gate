@@ -93,6 +93,10 @@ Die folgenden Erwartungen beschreiben das Zielverhalten für ein späteres `WEG_
 
 Die nachfolgenden Schritte für Validatoren, Commit, Pull-Request-Erstellung und Issue-Verknüpfung wurden übersprungen. Der Workflow hinterließ im Issue ausschließlich den generischen sicheren Abbruchkommentar mit Lauf-Link. Es entstand kein zusätzlicher Branch, Commit oder Pull Request: Pull Request [#2](https://github.com/ki-tomat/kitomat-ap14-gate/pull/2) enthielt danach weiterhin genau den ursprünglichen Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`; im Repository blieben insgesamt die zwei bereits vorhandenen offenen Pull Requests #2 und #3 bestehen.
 
+**Live-Ergebnis des ID-Kollisionstests vom 15. September 2026: fail-closed bestanden.** Das neue synthetische Issue [#4](https://github.com/ki-tomat/kitomat-ap14-gate/issues/4) enthielt denselben Prompt-Payload, dieselbe Artefakt-ID `synthetische-kundenanfrage-sortieren` und denselben Payload-Hash wie Issue #1. Nach der Maintainer-Labelvergabe stoppte Lauf [#34945425451](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34945425451) nach 13 Sekunden ebenfalls im Schritt „Vorhandene Import-Branch-Familie ausschließen“ mit der Meldung `Import abgebrochen: Für diese Artefakt-ID existiert bereits eine Import-Branch.`
+
+Die nachfolgenden Validator-, Commit-, Pull-Request- und Issue-Verknüpfungsschritte wurden übersprungen; der sichere Standardkommentar verlinkte den Lauf in Issue #4. Der Remote-Bestand blieb bei genau drei Branches (`main`, `docs/ap14-live-happy-path` und `prompt/synthetische-kundenanfrage-sortieren-i1`) sowie zwei offenen Pull Requests. Insbesondere entstand keine Branch mit Issue-Nummer 4, und Pull Request #2 enthielt weiterhin nur Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`.
+
 ## F. Angriffsmatrix
 
 | Angriff | Erwartung |

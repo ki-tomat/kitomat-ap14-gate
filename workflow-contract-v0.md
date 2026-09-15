@@ -56,7 +56,8 @@ Der `validate`-Lauf [#34940119833](https://github.com/ki-tomat/kitomat-ap14-gate
 ## Noch offene Live-Voraussetzungen
 
 - Der erste Wiederholungsfall „gleiches Issue, gleicher Hash“ ist fail-closed belegt: Lauf [#34943076046](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34943076046) erkannte am 15. September 2026 die vorhandene Import-Branch vor Validatoren, Commit und Pull-Request-Erstellung. PR #2 blieb bei einem Commit; ein zusätzlicher Branch oder Pull Request entstand nicht.
-- Die weiteren Negativ-, Kollisions- und Wiederholungsfälle müssen protokolliert werden.
+- Der Kollisionsfall „zweites Issue, gleiche Artefakt-ID“ ist ebenfalls fail-closed belegt: Issue [#4](https://github.com/ki-tomat/kitomat-ap14-gate/issues/4) und Lauf [#34945425451](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34945425451) erzeugten keinen zusätzlichen Branch, Commit oder Pull Request.
+- Die weiteren Negativ- und Wiederholungsfälle müssen protokolliert werden.
 - Verhalten nach einem Fehler zwischen Branch-Push und PR-Erstellung muss live geprüft werden; der erneute Lauf bleibt bis dahin fail-closed.
 
 Fehlgeschlagene Läufe schreiben einen generischen Issue-Kommentar mit Link zum Workflow-Lauf. Details aus Nutzereingaben werden darin nicht wiederholt.
