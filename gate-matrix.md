@@ -76,6 +76,8 @@ GitHub hielt den ersten `validate`-Lauf für den erstmalig beitragenden `github-
 
 ## E. Idempotenz und Zustände
 
+Die folgenden Erwartungen beschreiben das Zielverhalten für ein späteres `WEG_A_GO`. Der aktuelle Prototyp blockiert Wiederholungen und ID-Kollisionen zunächst bewusst fail-closed, sobald bereits eine Import-Branch derselben Typ-/ID-Familie vorhanden ist.
+
 | Fall | Erwartung |
 | --- | --- |
 | Gleiches Issue, gleicher Hash | No-op, vorhandenen PR verlinken |
@@ -86,6 +88,10 @@ GitHub hielt den ersten `validate`-Lauf für den erstmalig beitragenden `github-
 | Zugeordneter PR geschlossen | keine automatische Wiederöffnung |
 | Zugeordneter PR gemergt | kein Wiederanlauf |
 | Parallele Läufe desselben Issues | durch Concurrency serialisiert |
+
+**Live-Ergebnis des ersten Wiederholungstests vom 15. September 2026: fail-closed bestanden.** Am unveränderten synthetischen Issue [#1](https://github.com/ki-tomat/kitomat-ap14-gate/issues/1) wurde das Label `webui-import` entfernt und bei identischem Payload sowie identischem Hash erneut gesetzt. Der zweite Importlauf [#34943076046](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34943076046) stoppte erwartungsgemäß im Schritt „Vorhandene Import-Branch-Familie ausschließen“ mit dem Hinweis, dass für diese Artefakt-ID bereits eine Import-Branch existiert.
+
+Die nachfolgenden Schritte für Validatoren, Commit, Pull-Request-Erstellung und Issue-Verknüpfung wurden übersprungen. Der Workflow hinterließ im Issue ausschließlich den generischen sicheren Abbruchkommentar mit Lauf-Link. Es entstand kein zusätzlicher Branch, Commit oder Pull Request: Pull Request [#2](https://github.com/ki-tomat/kitomat-ap14-gate/pull/2) enthielt danach weiterhin genau den ursprünglichen Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`; im Repository blieben insgesamt die zwei bereits vorhandenen offenen Pull Requests #2 und #3 bestehen.
 
 ## F. Angriffsmatrix
 
