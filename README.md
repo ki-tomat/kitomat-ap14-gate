@@ -2,7 +2,7 @@
 
 Temporäres, öffentliches Test-Repository für das technische Go/No-Go-Gate von AP14 (Beitrag vorbereiten).
 
-**Status:** AP14.0-Baseline, Codec und Generator veröffentlicht; der synthetische GitHub-Live-Happy-Path sowie die ersten fail-closed Wiederholungs- und ID-Kollisionstests wurden am 15. September 2026 bestanden; kein Produktivcode.
+**Status:** AP14.0-Baseline, Codec und Generator veröffentlicht; der synthetische GitHub-Live-Happy-Path sowie die ersten fail-closed Wiederholungs-, ID-Kollisions- und Pfadangriffstests wurden am 15. September 2026 bestanden; kein Produktivcode.
 
 ## Zweck
 
@@ -55,4 +55,4 @@ Der Codec validiert die feste Payload-Hülle, die typspezifischen Feldlisten, Da
 
 ## Nächster Schritt
 
-Nach dem bestandenen synthetischen Live-Happy-Path sowie den ersten fail-closed Wiederholungs- und ID-Kollisionstests folgen die weiteren dokumentierten Negativ- und Wiederholungsfälle. Wiederholungen bleiben zunächst fail-closed. Vor der späteren Produktivübernahme muss außerdem der dokumentierte quote-unsichere YAML-Fallback im Produkt-Repository korrigiert werden. Produktiver AP14-Code entsteht erst nach bestandenem vollständigem Gate.
+Nach dem bestandenen synthetischen Live-Happy-Path sowie den ersten fail-closed Wiederholungs-, ID-Kollisions- und Pfadangriffstests folgen die weiteren dokumentierten Negativ- und Wiederholungsfälle. Wiederholungen bleiben zunächst fail-closed. Vor der späteren Produktivübernahme muss außerdem der dokumentierte quote-unsichere YAML-Fallback im Produkt-Repository korrigiert werden. Produktiver AP14-Code entsteht erst nach bestandenem vollständigem Gate.

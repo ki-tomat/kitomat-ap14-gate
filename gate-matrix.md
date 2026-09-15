@@ -35,7 +35,7 @@ Zusätzlich werden Grenzfälle knapp unter und über 32 KiB Payload sowie 55.000
 | falscher Datentyp | Ablehnung |
 | Payload über 32 KiB | Ablehnung vor Generierung |
 
-Lokaler Prüfstand vom 14. September 2026: **24/24 automatisierte Codec-Tests bestanden**. Abgedeckt sind die drei Fixture-Roundtrips, Unicode und Zeilenenden, kurze und zu lange Pre-fill-URLs, Marker-, Base64-, UTF-8-, JSON-, Versions-, Feld-, Typ- und Bestätigungsfehler sowie die Grenzwerte 32 KiB und 55.000 Zeichen jeweils direkt an und über der Grenze. Generator- und Pfadangriffe bleiben bis zum nächsten Gate-Schritt offen.
+Lokaler Prüfstand vom 14. September 2026: **24/24 automatisierte Codec-Tests bestanden**. Abgedeckt sind die drei Fixture-Roundtrips, Unicode und Zeilenenden, kurze und zu lange Pre-fill-URLs, Marker-, Base64-, UTF-8-, JSON-, Versions-, Feld-, Typ- und Bestätigungsfehler sowie die Grenzwerte 32 KiB und 55.000 Zeichen jeweils direkt an und über der Grenze. Generator- und Pfadangriffe werden in Abschnitt F behandelt; der erste Live-Pfadangriff ist dort inzwischen fail-closed belegt.
 
 ## C. Browser- und Clipboard-Matrix
 
@@ -115,6 +115,10 @@ Die nachfolgenden Validator-, Commit-, Pull-Request- und Issue-Verknüpfungsschr
 | fremde Branch-Zuordnung | nicht verändern |
 
 Jeder Negativfall muss mit verständlichem Issue-Kommentar enden und darf keinen Commit erzeugen.
+
+**Live-Ergebnis des Pfadangriffstests vom 15. September 2026: fail-closed bestanden.** Das synthetische Issue [#5](https://github.com/ki-tomat/kitomat-ap14-gate/issues/5) enthielt im Payload die manipulierte Artefakt-ID `../../.github/workflows/x.yml` mit dem Payload-Hash `9d4c58bf1c51e63ce6f9d469ce6e139f5f531ab0d39de1c037481b69320a2623`. Lauf [#34948664732](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34948664732) stoppte nach 11 Sekunden im Schritt „Import sicher vorbereiten“ mit `INVALID_ID: Artefakt-ID muss ein kleingeschriebener, maximal 80 Zeichen langer Slug sein.`
+
+Alle folgenden Schritte für Branch-Familienprüfung, Validatoren, Commit, Pull-Request-Erstellung und Issue-Verknüpfung wurden übersprungen. Issue #5 erhielt ausschließlich den generischen sicheren Abbruchkommentar mit Lauf-Link. Der Remote-Bestand blieb bei den drei bekannten Branches, zwei offenen Pull Requests und dem unveränderten Einzelcommit `dc820e499945e2c30d5576f5210b512a3cb283e4` in Pull Request #2; insbesondere wurde weder unter `.github/` noch an einem anderen Ziel geschrieben.
 
 Lokaler Workflow-Prüfstand vom 14. September 2026: 64/64 JavaScript- und 5/5 Python-Tests bestanden. Pfad-Traversal, absolute Pfade, `.github` als Ziel, überlange und platzhalterhaltige IDs, `pXX`, manipuliertes `data_risk`, Steuerzeichen, symbolische Zielwurzeln sowie globale und parallele ID-Kollisionen werden abgewiesen. Shell-Zeichen und `${{ ... }}` bleiben reiner Dateiinhalt. Die drei Fixture-Ausgaben umfassen exakt 7/5/7 Dateien, sind bytegenau deterministisch, verwenden ausschließlich LF und bestehen gemeinsam die Validatoren für Metadaten, Vollständigkeit und PII-Hinweise. Importplan und Dateisystem-Vorbereitung sind lokal geprüft; Workflow-Kommentare, GitHub-Berechtigungen, Branch-Push und Pull-Request-Zuordnung bleiben bis zum Live-Gate offen.
 
