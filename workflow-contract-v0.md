@@ -62,7 +62,14 @@ Der `validate`-Lauf [#34940119833](https://github.com/ki-tomat/kitomat-ap14-gate
 - Der verbotene Maintainer-Platzhalter `pXX` ist live fail-closed belegt: Issue [#7](https://github.com/ki-tomat/kitomat-ap14-gate/issues/7) und Lauf [#35851298845](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/35851298845) wurden mit `INVALID_MAINTAINER` in der Importvorbereitung gestoppt; der Remote-Bestand blieb unverändert.
 - Ein dekodiertes NUL-Zeichen in `answers.prompt_text` ist live fail-closed belegt: Issue [#8](https://github.com/ki-tomat/kitomat-ap14-gate/issues/8) und Lauf [#35852077459](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/35852077459) wurden mit `CONTROL_CHARACTER` in der Importvorbereitung gestoppt; der Remote-Bestand blieb unverändert.
 - Eine Artefakt-ID mit 81 Zeichen ist live fail-closed belegt: Der vor der Labelvergabe bytegenau verifizierte Payload aus Issue [#11](https://github.com/ki-tomat/kitomat-ap14-gate/issues/11) wurde in Lauf [#35864068815](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/35864068815) mit `INVALID_ID` in der Importvorbereitung gestoppt; es entstanden weder Branch noch Commit oder Pull Request.
-- Die weiteren Negativ- und Wiederholungsfälle müssen protokolliert werden.
+- Absolute Pfade, `.github` als Ziel, die Platzhalter-ID `replace-with-artifact-id` und ungültige UTF-8-Bytes sind durch Issues #12 bis #15 und die Läufe #35866132367, #35866319625, #35866468365 und #35866602298 live fail-closed belegt.
+- Shell- und Workflow-Syntax wurde durch Issue #16 und PR #17 als reiner Dateiinhalt belegt; der Validierungslauf #35866790380 war grün. PR und Branch wurden ohne Merge wieder entfernt.
+- Zwei parallele Läufe desselben Issue wurden durch die Läufe #35867407068 und #35867410704 nachweislich serialisiert.
+- Eine Änderung des Issue-Payloads ohne neues Labelereignis löste keinen Lauf aus und veränderte PR #2 nicht.
+- Ein vorab vorhandener fremder Branch blieb beim Lauf #35898542228 zu Issue #20 unverändert; der Workflow stoppte vor allen Schreibschritten.
+- **Offener Befund:** Das erneute Labeln eines bereits geschlossenen Issue erzeugte unerwartet PR #18. Der Workflow muss geschlossene Issues und bereits geschlossene zugeordnete PRs vor dem Schreiben erkennen.
+- **Offener Befund:** Das erneute Labeln von Issue #1 mit geändertem Hash aktualisierte den offenen PR #2 nicht, sondern Lauf #35867823054 brach an der vorhandenen Branch-Familie ab. Die im Vertrag geforderte kontrollierte Aktualisierung ist weiterhin nicht implementiert.
+- Die Zustände nach regulärem Merge und „Artefakt-ID bereits auf `main`“ können erst nach einem freigegebenen Merge vollständig live geprüft werden.
 - Verhalten nach einem Fehler zwischen Branch-Push und PR-Erstellung muss live geprüft werden; der erneute Lauf bleibt bis dahin fail-closed.
 
 Fehlgeschlagene Läufe schreiben einen generischen Issue-Kommentar mit Link zum Workflow-Lauf. Details aus Nutzereingaben werden darin nicht wiederholt.
