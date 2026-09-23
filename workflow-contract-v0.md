@@ -55,6 +55,8 @@ Der `validate`-Lauf [#34940119833](https://github.com/ki-tomat/kitomat-ap14-gate
 
 ## Noch offene Live-Voraussetzungen
 
+- Die AP14-Clipboard- und URL-Matrix für Chrome, Edge und Firefox ist noch nicht ausführbar: Der Gate-Prototyp besitzt keine Browser-Testseite; die veröffentlichte WebUI nutzt noch den älteren AP12-Handoff. Chrome und Firefox sind lokal vorhanden, Edge nicht.
+
 - Der erste Wiederholungsfall „gleiches Issue, gleicher Hash“ ist fail-closed belegt: Lauf [#34943076046](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34943076046) erkannte am 15. September 2026 die vorhandene Import-Branch vor Validatoren, Commit und Pull-Request-Erstellung. PR #2 blieb bei einem Commit; ein zusätzlicher Branch oder Pull Request entstand nicht.
 - Der Kollisionsfall „zweites Issue, gleiche Artefakt-ID“ ist ebenfalls fail-closed belegt: Issue [#4](https://github.com/ki-tomat/kitomat-ap14-gate/issues/4) und Lauf [#34945425451](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34945425451) erzeugten keinen zusätzlichen Branch, Commit oder Pull Request.
 - Der Pfadangriff `../../.github/workflows/x.yml` ist live fail-closed belegt: Issue [#5](https://github.com/ki-tomat/kitomat-ap14-gate/issues/5) und Lauf [#34948664732](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34948664732) wurden mit `INVALID_ID` bereits in der Importvorbereitung gestoppt; alle Git-Schreibschritte blieben aus.
@@ -71,5 +73,7 @@ Der `validate`-Lauf [#34940119833](https://github.com/ki-tomat/kitomat-ap14-gate
 - **Offener Befund:** Das erneute Labeln von Issue #1 mit geändertem Hash aktualisierte den offenen PR #2 nicht, sondern Lauf #35867823054 brach an der vorhandenen Branch-Familie ab. Die im Vertrag geforderte kontrollierte Aktualisierung ist weiterhin nicht implementiert.
 - Die Zustände nach regulärem Merge und „Artefakt-ID bereits auf `main`“ können erst nach einem freigegebenen Merge vollständig live geprüft werden.
 - Verhalten nach einem Fehler zwischen Branch-Push und PR-Erstellung muss live geprüft werden; der erneute Lauf bleibt bis dahin fail-closed.
+- Die Repository-Einstellungen wurden am 23. September 2026 live geprüft: `main` ist geschützt, verlangt `validate` und eine menschliche Freigabe, verbietet Force-Push und Löschen und wendet den Schutz auch auf Administratoren an. GitHub Actions dürfen Pull Requests erstellen; die Token-Standardberechtigung bleibt read-only und wird nur durch den expliziten minimalen `permissions`-Block des Workflows erweitert.
+- Die GitHub-Issue-Maske akzeptierte 55.000 Zeichen und wies einen unveröffentlichten Entwurf mit 65.537 Zeichen unter Nennung des effektiven Limits von 65.536 Zeichen zurück.
 
 Fehlgeschlagene Läufe schreiben einen generischen Issue-Kommentar mit Link zum Workflow-Lauf. Details aus Nutzereingaben werden darin nicht wiederholt.

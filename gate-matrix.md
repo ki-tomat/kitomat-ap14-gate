@@ -47,6 +47,8 @@ Lokaler Prüfstand vom 14. September 2026: **24/24 automatisierte Codec-Tests be
 
 Bei verweigertem Clipboard-Zugriff muss ein auswählbares Textfeld mit manueller Kopieranleitung erscheinen.
 
+**Prüfstatus vom 23. September 2026: noch nicht ausführbar.** Der Gate-Prototyp stellt Codec und Generator derzeit als Node-Module bereit, aber noch keine Browser-Testseite mit AP14-Payload, Clipboard-Fallback und 1.500-Zeichen-URL-Gate. Die veröffentlichte KItomat-Seite enthält weiterhin den älteren AP12-GitHub-Handoff und ist daher kein gültiger Prüfling für diesen Vertrag. Auf dem Testrechner sind Chrome und Firefox installiert; Edge steht nicht zur Verfügung. Die Matrix bleibt bewusst offen, bis eine minimale AP14-Browseroberfläche vorhanden ist und Edge in einer geeigneten Testumgebung geprüft werden kann.
+
 ## D. GitHub-Happy-Path
 
 1. Issue-Body enthält lesbare Zusammenfassung und genau einen Payload.
@@ -171,6 +173,18 @@ Vor dem Lauf prüfen und protokollieren:
 - Branch-Schutz verlangt `validate` und mindestens eine menschliche Freigabe.
 - Force Push und Branch-Löschung sind gesperrt.
 - Das Label `webui-import` existiert.
+
+**Live-Prüfung vom 23. September 2026: bestanden.** In den angemeldeten GitHub-Einstellungen wurde Folgendes abgelesen:
+
+- `main` ist der Standardbranch.
+- GitHub Actions sind aktiviert. Das Repository erlaubt Actions generell; die im Workflow verwendeten Fremd-Actions sind zusätzlich auf vollständige Commit-SHAs festgelegt.
+- Die Standardberechtigung des `GITHUB_TOKEN` ist read-only. Der Import-Workflow fordert davon abweichend ausschließlich `contents: write`, `issues: write` und `pull-requests: write` an.
+- „Allow GitHub Actions to create and approve pull requests“ ist aktiviert. Der Workflow nutzt davon nur die PR-Erstellung und erteilt keine Freigabe.
+- Die Schutzregel für `main` verlangt einen Pull Request, genau eine menschliche Freigabe und den Statuscheck `validate` von GitHub Actions.
+- Der Schutz gilt auch für Administratoren. Force-Push und Löschen von `main` sind nicht erlaubt.
+- Das Label `webui-import` ist vorhanden und hat die dokumentierten Live-Läufe ausgelöst.
+
+Die Issue-Erstellmaske akzeptierte einen unveröffentlichten Entwurf mit 55.000 Zeichen vollständig. Bei 65.537 Zeichen zeigte GitHub `Body can not be longer than 65536 characters`; der Entwurf wurde anschließend geleert und nicht veröffentlicht. Damit liegt das effektive GitHub-Limit bei 65.536 Zeichen und der eigene Vorabgrenzwert von 55.000 Zeichen mit Sicherheitsabstand darunter.
 
 ## H. Go/No-Go
 
