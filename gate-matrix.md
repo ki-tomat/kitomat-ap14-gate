@@ -124,6 +124,10 @@ Alle folgenden Schritte für Branch-Familienprüfung, Validatoren, Commit, Pull-
 
 Alle nachfolgenden Schritte wurden übersprungen, und Issue #6 erhielt den generischen sicheren Abbruchkommentar mit Lauf-Link. Der Remote-Bestand blieb unverändert bei drei Branches und zwei offenen Pull Requests; Pull Request #2 enthielt weiterhin ausschließlich Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`.
 
+**Live-Ergebnis des Maintainer-Policytests vom 23. September 2026: fail-closed bestanden.** Das synthetische Issue [#7](https://github.com/ki-tomat/kitomat-ap14-gate/issues/7) verwendete die neue gültige Artefakt-ID `maintainer-placeholder-test`, setzte den Maintainer aber auf den verbotenen Template-Platzhalter `pXX`. Der Payload-Hash lautete `4dca73383c8bf0726ba975c9fe5942317f241581d9dca355e1916e1a514a5f89`. Lauf [#35851298845](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/35851298845) stoppte nach 18 Sekunden im Schritt „Import sicher vorbereiten“ mit `INVALID_MAINTAINER: Maintainer ist ungültig oder noch ein Template-Platzhalter.`
+
+Alle nachfolgenden Schritte wurden übersprungen, und Issue #7 erhielt den generischen sicheren Abbruchkommentar mit Lauf-Link. Der Remote-Bestand blieb unverändert bei drei Branches und zwei offenen Pull Requests; Pull Request #2 enthielt weiterhin ausschließlich Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`.
+
 Lokaler Workflow-Prüfstand vom 14. September 2026: 64/64 JavaScript- und 5/5 Python-Tests bestanden. Pfad-Traversal, absolute Pfade, `.github` als Ziel, überlange und platzhalterhaltige IDs, `pXX`, manipuliertes `data_risk`, Steuerzeichen, symbolische Zielwurzeln sowie globale und parallele ID-Kollisionen werden abgewiesen. Shell-Zeichen und `${{ ... }}` bleiben reiner Dateiinhalt. Die drei Fixture-Ausgaben umfassen exakt 7/5/7 Dateien, sind bytegenau deterministisch, verwenden ausschließlich LF und bestehen gemeinsam die Validatoren für Metadaten, Vollständigkeit und PII-Hinweise. Importplan und Dateisystem-Vorbereitung sind lokal geprüft; Workflow-Kommentare, GitHub-Berechtigungen, Branch-Push und Pull-Request-Zuordnung bleiben bis zum Live-Gate offen.
 
 ## G. Repository-Einstellungen
