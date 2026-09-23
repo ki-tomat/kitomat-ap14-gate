@@ -128,6 +128,10 @@ Alle nachfolgenden Schritte wurden übersprungen, und Issue #6 erhielt den gener
 
 Alle nachfolgenden Schritte wurden übersprungen, und Issue #7 erhielt den generischen sicheren Abbruchkommentar mit Lauf-Link. Der Remote-Bestand blieb unverändert bei drei Branches und zwei offenen Pull Requests; Pull Request #2 enthielt weiterhin ausschließlich Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`.
 
+**Live-Ergebnis des Steuerzeichen-Tests vom 23. September 2026: fail-closed bestanden.** Das synthetische Issue [#8](https://github.com/ki-tomat/kitomat-ap14-gate/issues/8) verwendete die neue gültige Artefakt-ID `control-character-test` und enthielt nach dem Dekodieren genau ein NUL-Zeichen in `answers.prompt_text`. Der Payload-Hash lautete `0c82a5914e68e4cecd19eb3d6cdbeb646bdcadae2f6f94c75e114cd80e5e705a`. Lauf [#35852077459](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/35852077459) stoppte im Schritt „Import sicher vorbereiten“ mit `CONTROL_CHARACTER: payload.answers.prompt_text enthält ein unzulässiges Steuerzeichen.`
+
+Alle nachfolgenden Schritte wurden übersprungen, und Issue #8 erhielt den generischen sicheren Abbruchkommentar mit Lauf-Link. Der Remote-Bestand blieb unverändert bei drei Branches und zwei offenen Pull Requests; Pull Request #2 enthielt weiterhin ausschließlich Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`.
+
 Lokaler Workflow-Prüfstand vom 14. September 2026: 64/64 JavaScript- und 5/5 Python-Tests bestanden. Pfad-Traversal, absolute Pfade, `.github` als Ziel, überlange und platzhalterhaltige IDs, `pXX`, manipuliertes `data_risk`, Steuerzeichen, symbolische Zielwurzeln sowie globale und parallele ID-Kollisionen werden abgewiesen. Shell-Zeichen und `${{ ... }}` bleiben reiner Dateiinhalt. Die drei Fixture-Ausgaben umfassen exakt 7/5/7 Dateien, sind bytegenau deterministisch, verwenden ausschließlich LF und bestehen gemeinsam die Validatoren für Metadaten, Vollständigkeit und PII-Hinweise. Importplan und Dateisystem-Vorbereitung sind lokal geprüft; Workflow-Kommentare, GitHub-Berechtigungen, Branch-Push und Pull-Request-Zuordnung bleiben bis zum Live-Gate offen.
 
 ## G. Repository-Einstellungen
