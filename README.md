@@ -18,6 +18,7 @@ Payload → Clipboard/Issue → Maintainer-Label → GitHub Action
 - `payload-contract-v0.md`: minimaler Testvertrag zwischen Browser und Action
 - `generator-contract-v0.md`: feste Generatorpfade, Dateilisten und Sicherheitsgrenzen
 - `workflow-contract-v0.md`: Trigger, Vertrauensgrenzen, Schreibpfad und offene Live-Gates
+- `browser-test/`: minimaler lokaler Prüfling für Clipboard- und 1.500-Zeichen-URL-Gate
 - `gate-matrix.md`: Mess-, Browser-, Workflow- und Angriffsmatrix
 - `fixtures/prompt.json`: synthetischer Prompt-Beitrag
 - `fixtures/dataset.json`: synthetisches Dataset-Paket
@@ -51,7 +52,7 @@ npm run measure
 npm run generate:fixture -- --fixture prompt --repository-root /tmp/kitomat-ap14-test
 ```
 
-Der Codec validiert die feste Payload-Hülle, die typspezifischen Feldlisten, Datentypen, Bestätigungen, Marker, Base64, UTF-8 und die vorläufige 32-KiB-Grenze. SHA-256 wird über die exakt dekodierten Payload-Bytes berechnet. Der Generator erzeugt anschließend ausschließlich allowlist-basierte KItomat-Pflichtdateien und einen deterministischen Manifest-Hash. Der lokale Stand umfasst 64 JavaScript- und 5 Python-Tests.
+Der Codec validiert die feste Payload-Hülle, die typspezifischen Feldlisten, Datentypen, Bestätigungen, Marker, Base64, UTF-8 und die vorläufige 32-KiB-Grenze. SHA-256 wird über die exakt dekodierten Payload-Bytes berechnet. Der Generator erzeugt anschließend ausschließlich allowlist-basierte KItomat-Pflichtdateien und einen deterministischen Manifest-Hash. Der lokale Stand umfasst 83 JavaScript- und 5 Python-Tests.
 
 ## Nächster Schritt
 

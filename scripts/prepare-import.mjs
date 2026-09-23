@@ -1,7 +1,7 @@
 import { appendFile, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { generateArtifact } from "../src/artifact-generator.mjs";
+import { generateArtifact, planArtifact } from "../src/artifact-generator.mjs";
 import { buildPullRequestBody, prepareImportPlan } from "../src/import-plan.mjs";
 
 function requireEnvironment(environment, name) {
@@ -25,7 +25,11 @@ export async function prepareImport(environment = process.env) {
   const repositoryRoot = environment.GITHUB_WORKSPACE || process.cwd();
   const event = JSON.parse(await readFile(eventPath, "utf8"));
   const plan = prepareImportPlan(event, { expectedRepository: repository });
-  const generated = await generateArtifact(plan.payload, { repositoryRoot });
+  const artifactPlan = planArtifact(plan.payload);
+  const generated =
+    environment.KITOMAT_PLAN_ONLY === "true"
+      ? null
+      : await generateArtifact(plan.payload, { repositoryRoot });
   const pullRequestBodyPath = path.join(runnerTemp, `kitomat-pr-body-${plan.issueNumber}.md`);
   await writeFile(pullRequestBodyPath, buildPullRequestBody(plan), {
     encoding: "utf8",
@@ -41,7 +45,7 @@ export async function prepareImport(environment = process.env) {
     issue_author: plan.issueAuthor,
     issue_number: String(plan.issueNumber),
     label_actor: plan.labelActor,
-    manifest_sha256: generated.manifestSha256,
+    manifest_sha256: artifactPlan.manifestSha256,
     payload_sha256: plan.payloadSha256,
     pr_body_path: pullRequestBodyPath,
     pr_title: plan.pullRequestTitle,
@@ -57,8 +61,9 @@ export async function prepareImport(environment = process.env) {
     branch: plan.branch,
     artifactPath: plan.relativeDirectory,
     payloadSha256: plan.payloadSha256,
-    manifestSha256: generated.manifestSha256,
-    fileCount: generated.fileCount
+    manifestSha256: artifactPlan.manifestSha256,
+    fileCount: generated?.fileCount ?? artifactPlan.files.length,
+    generated: generated !== null
   };
 }
 
