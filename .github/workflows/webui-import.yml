@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
-          fetch-depth: 1
+          fetch-depth: 0
           persist-credentials: true
 
       - name: Berechtigung des Label-Akteurs prüfen
@@ -59,44 +59,141 @@ jobs:
 
       - name: Import sicher vorbereiten
         id: prepare
+        env:
+          KITOMAT_PLAN_ONLY: "true"
         run: node scripts/prepare-import.mjs
 
-      - name: Vorhandene Import-Branch-Familie ausschließen
+      - name: Vorhandenen Importzustand eindeutig auflösen
+        id: state
         env:
+          ARTIFACT_ID: ${{ steps.prepare.outputs.artifact_id }}
+          ARTIFACT_PATH: ${{ steps.prepare.outputs.artifact_path }}
+          BRANCH: ${{ steps.prepare.outputs.branch }}
           BRANCH_FAMILY: ${{ steps.prepare.outputs.branch_family }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
+          PAYLOAD_SHA256: ${{ steps.prepare.outputs.payload_sha256 }}
+          PULL_REQUESTS_PATH: ${{ runner.temp }}/kitomat-pull-requests.json
+          BRANCHES_PATH: ${{ runner.temp }}/kitomat-branches.txt
         run: |
-          existing="$(git ls-remote --heads origin "refs/heads/${BRANCH_FAMILY}*")"
-          if [[ -n "$existing" ]]; then
-            printf 'Import abgebrochen: Für diese Artefakt-ID existiert bereits eine Import-Branch.\n' >&2
-            exit 1
+          git ls-remote --heads origin "refs/heads/${BRANCH_FAMILY}*" > "$BRANCHES_PATH"
+          gh pr list \
+            --state all \
+            --limit 200 \
+            --json number,state,mergedAt,headRefName,url,body \
+            > "$PULL_REQUESTS_PATH"
+
+          if git cat-file -e "HEAD:${ARTIFACT_PATH}" 2>/dev/null; then
+            export MAIN_ARTIFACT_EXISTS=true
+          else
+            export MAIN_ARTIFACT_EXISTS=false
           fi
+          node scripts/resolve-import-state.mjs
 
-      - name: Validator-Fallback testen
-        run: python3 -m unittest discover -s tools/validators -p 'test_*.py' -v
+      - name: Erwarteten sicheren Stopp im Issue melden
+        if: contains(fromJSON('["noop", "closed", "merged", "main_exists", "collision"]'), steps.state.outputs.mode)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
+          MODE: ${{ steps.state.outputs.mode }}
+          PR_URL: ${{ steps.state.outputs.pr_url }}
+        run: |
+          case "$MODE" in
+            noop)
+              message="Der AP14-Beitrag ist unverändert. Der vorhandene Pull Request bleibt bestehen: ${PR_URL}"
+              ;;
+            closed)
+              message="Der zugeordnete Pull Request ist geschlossen und wird nicht automatisch wieder geöffnet: ${PR_URL}"
+              ;;
+            merged)
+              message="Der zugeordnete Pull Request wurde bereits gemergt; es wird kein neuer Import gestartet: ${PR_URL}"
+              ;;
+            main_exists)
+              message="Die Artefakt-ID ist bereits auf main vorhanden. Der Import wurde ohne Änderung gestoppt."
+              ;;
+            collision)
+              message="Für diese Artefakt-ID existiert bereits ein anderer Branch oder Pull Request. Der Import wurde ohne Änderung gestoppt."
+              ;;
+          esac
+          gh issue comment "$ISSUE_NUMBER" --body "$message"
 
-      - name: Generierte Metadaten validieren
-        run: python3 tools/validators/validate_metadata.py
-
-      - name: Generierte Vollständigkeit validieren
-        run: python3 tools/validators/validate_completeness.py
-
-      - name: Generierte Inhalte auf PII-Hinweise prüfen
-        run: python3 tools/validators/pii_heuristic.py
-
-      - name: Ausschließlich das generierte Artefakt committen
+      - name: Zugeordnete Branch für Update oder Wiederaufnahme auschecken
+        if: steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
         env:
           ARTIFACT_ID: ${{ steps.prepare.outputs.artifact_id }}
           ARTIFACT_PATH: ${{ steps.prepare.outputs.artifact_path }}
           BRANCH: ${{ steps.prepare.outputs.branch }}
           ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
+          MODE: ${{ steps.state.outputs.mode }}
+        run: |
+          git fetch --no-tags origin "$BRANCH"
+          git switch --create "$BRANCH" --track "origin/$BRANCH"
+
+          if [[ "$MODE" == "recover" ]]; then
+            expected_subject="Add AP14 artifact ${ARTIFACT_ID} (#${ISSUE_NUMBER})"
+            actual_subject="$(git log -1 --format=%s)"
+            actual_email="$(git log -1 --format=%ae)"
+            if [[ "$actual_subject" != "$expected_subject" || "$actual_email" != "41898282+github-actions[bot]@users.noreply.github.com" ]]; then
+              printf 'Import abgebrochen: Verwaiste Branch ist keinem erwarteten Bot-Commit zuzuordnen.\n' >&2
+              exit 1
+            fi
+          fi
+
+          while IFS= read -r changed_path; do
+            case "$changed_path" in
+              "$ARTIFACT_PATH"/*) ;;
+              *)
+                printf 'Import abgebrochen: Zugeordnete Branch enthält einen fremden Pfad %s.\n' "$changed_path" >&2
+                exit 1
+                ;;
+            esac
+          done < <(git diff --name-only origin/main...HEAD)
+
+          git rm -r -- "$ARTIFACT_PATH"
+
+      - name: Artefakt für neuen oder aktualisierten Import erzeugen
+        if: steps.state.outputs.mode == 'create' || steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
+        run: node scripts/generate-import-artifact.mjs
+
+      - name: Validator-Fallback testen
+        if: steps.state.outputs.mode == 'create' || steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
+        run: python3 -m unittest discover -s tools/validators -p 'test_*.py' -v
+
+      - name: Generierte Metadaten validieren
+        if: steps.state.outputs.mode == 'create' || steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
+        run: python3 tools/validators/validate_metadata.py
+
+      - name: Generierte Vollständigkeit validieren
+        if: steps.state.outputs.mode == 'create' || steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
+        run: python3 tools/validators/validate_completeness.py
+
+      - name: Generierte Inhalte auf PII-Hinweise prüfen
+        if: steps.state.outputs.mode == 'create' || steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
+        run: python3 tools/validators/pii_heuristic.py
+
+      - name: Ausschließlich das generierte Artefakt committen
+        if: steps.state.outputs.mode == 'create' || steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
+        env:
+          ARTIFACT_ID: ${{ steps.prepare.outputs.artifact_id }}
+          ARTIFACT_PATH: ${{ steps.prepare.outputs.artifact_path }}
+          BRANCH: ${{ steps.prepare.outputs.branch }}
+          ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}
+          MODE: ${{ steps.state.outputs.mode }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch --create "$BRANCH"
+          if [[ "$MODE" == "create" ]]; then
+            git switch --create "$BRANCH"
+          fi
           git add -- "$ARTIFACT_PATH"
 
           if git diff --cached --quiet; then
-            printf 'Import abgebrochen: Keine Artefaktdateien zum Committen gefunden.\n' >&2
+            if [[ "$MODE" != "recover" ]]; then
+              printf 'Import abgebrochen: Keine Artefaktdateien zum Committen gefunden.\n' >&2
+              exit 1
+            fi
+          elif [[ "$MODE" == "recover" ]]; then
+            printf 'Import abgebrochen: Verwaiste Branch entspricht nicht dem aktuellen Payload.\n' >&2
             exit 1
           fi
 
@@ -110,26 +207,56 @@ jobs:
             esac
           done < <(git diff --cached --name-only)
 
-          git commit -m "Add AP14 artifact ${ARTIFACT_ID} (#${ISSUE_NUMBER})"
-          git push --set-upstream origin "$BRANCH"
+          if [[ "$MODE" == "create" ]]; then
+            git commit -m "Add AP14 artifact ${ARTIFACT_ID} (#${ISSUE_NUMBER})"
+            git push --set-upstream origin "$BRANCH"
+          elif [[ "$MODE" == "update" ]]; then
+            git commit -m "Update AP14 artifact ${ARTIFACT_ID} (#${ISSUE_NUMBER})"
+            git push origin "$BRANCH"
+          fi
 
-      - name: Pull Request ohne automatische Freigabe erstellen
+      - name: Testweise Unterbrechung nach Branch-Push
+        if: steps.state.outputs.mode == 'create' && github.repository == 'ki-tomat/kitomat-ap14-gate'
+        run: |
+          node --input-type=module -e '
+            import { readFile } from "node:fs/promises";
+            const event = JSON.parse(await readFile(process.env.GITHUB_EVENT_PATH, "utf8"));
+            if (event.issue.labels.some((label) => label.name === "ap14-test-fail-after-push")) {
+              console.error("AP14_TEST_FAILURE: Kontrollierter Gate-Abbruch nach Branch-Push.");
+              process.exit(1);
+            }
+          '
+
+      - name: Pull Request ohne automatische Freigabe erstellen oder aktualisieren
         id: pull_request
+        if: steps.state.outputs.mode == 'create' || steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
         env:
           BRANCH: ${{ steps.prepare.outputs.branch }}
           DATA_RISK: ${{ steps.prepare.outputs.data_risk }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_BODY_PATH: ${{ steps.prepare.outputs.pr_body_path }}
+          PR_NUMBER: ${{ steps.state.outputs.pr_number }}
           PR_TITLE: ${{ steps.prepare.outputs.pr_title }}
+          MODE: ${{ steps.state.outputs.mode }}
         run: |
-          pr_url="$(gh pr create \
-            --base main \
-            --head "$BRANCH" \
-            --title "$PR_TITLE" \
-            --body-file "$PR_BODY_PATH" \
-            --label artifact \
-            --label needs-review \
-            --label "risk_${DATA_RISK}")"
+          if [[ "$MODE" == "create" || "$MODE" == "recover" ]]; then
+            pr_url="$(gh pr create \
+              --base main \
+              --head "$BRANCH" \
+              --title "$PR_TITLE" \
+              --body-file "$PR_BODY_PATH" \
+              --label artifact \
+              --label needs-review \
+              --label "risk_${DATA_RISK}")"
+          else
+            gh pr edit "$PR_NUMBER" \
+              --title "$PR_TITLE" \
+              --body-file "$PR_BODY_PATH" \
+              --add-label artifact \
+              --add-label needs-review \
+              --add-label "risk_${DATA_RISK}"
+            pr_url="$(gh pr view "$PR_NUMBER" --json url --jq .url)"
+          fi
 
           if [[ ! "$pr_url" =~ ^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[0-9]+$ ]]; then
             printf 'Pull-Request-URL hat ein unerwartetes Format.\n' >&2
@@ -138,6 +265,7 @@ jobs:
           printf 'url=%s\n' "$pr_url" >> "$GITHUB_OUTPUT"
 
       - name: Issue mit dem Pull Request verknüpfen
+        if: steps.state.outputs.mode == 'create' || steps.state.outputs.mode == 'update' || steps.state.outputs.mode == 'recover'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ steps.prepare.outputs.issue_number }}

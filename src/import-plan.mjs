@@ -40,6 +40,9 @@ export function prepareImportPlan(event, { expectedRepository } = {}) {
   if (!Number.isSafeInteger(event.issue?.number) || event.issue.number <= 0) {
     fail("INVALID_ISSUE_NUMBER", "Issue-Nummer fehlt oder ist ungültig.");
   }
+  if (event.issue?.state !== "open") {
+    fail("ISSUE_NOT_OPEN", "Nur ein offenes Issue darf einen Import auslösen.");
+  }
   if (typeof event.issue?.body !== "string") {
     fail("INVALID_ISSUE_BODY", "Issue-Body fehlt im Label-Ereignis.");
   }

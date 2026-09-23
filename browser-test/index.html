@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AP14 Browser-Gate</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">KI-TOMAT · AP14.0</p>
+      <h1>Clipboard- und URL-Gate</h1>
+      <p>Diese lokale Testseite veröffentlicht nichts. Sie erzeugt nur den Issue-Text für die drei synthetischen Gate-Fixtures.</p>
+
+      <label for="fixture">Testbeitrag</label>
+      <select id="fixture">
+        <option value="prompt">Prompt-Paket</option>
+        <option value="dataset">Dataset</option>
+        <option value="industry">Branchenmodell</option>
+      </select>
+
+      <dl class="metrics">
+        <div><dt>UTF-8-JSON</dt><dd id="bytes">–</dd></div>
+        <div><dt>Issue-Body</dt><dd id="body-length">–</dd></div>
+        <div><dt>Vollständige URL</dt><dd id="url-length">–</dd></div>
+        <div><dt>URL-Gate</dt><dd id="url-state">–</dd></div>
+      </dl>
+
+      <label for="issue-body">Vollständiger Issue-Text</label>
+      <textarea id="issue-body" rows="18" readonly></textarea>
+      <p id="status" role="status" aria-live="polite"></p>
+      <p id="manual-help" hidden>Zwischenablage nicht verfügbar: Text im Feld markieren und mit Strg+C kopieren.</p>
+
+      <div class="actions">
+        <button id="copy" type="button">Issue-Text kopieren</button>
+        <a id="open-url" class="button secondary" href="#" target="_blank" rel="noopener">Kurze URL öffnen</a>
+      </div>
+    </main>
+    <script type="module" src="./app.mjs"></script>
+  </body>
+</html>

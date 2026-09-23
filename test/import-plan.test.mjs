@@ -29,6 +29,7 @@ async function validEvent(fixtureName = "prompt") {
     repository: { full_name: "ki-tomat/kitomat-ap14-gate" },
     issue: {
       number: 142,
+      state: "open",
       body: `Lesbare Einleitung\n\n${encodePayload(payload).block}`,
       html_url: "https://github.com/ki-tomat/kitomat-ap14-gate/issues/142",
       user: { login: "contributor-one" }
@@ -85,6 +86,7 @@ for (const [description, mutate, code] of [
   ["falsche Aktion", (event) => (event.action = "edited"), "INVALID_EVENT_ACTION"],
   ["falsches Label", (event) => (event.label.name = "bug"), "INVALID_IMPORT_LABEL"],
   ["fehlende Issue-Nummer", (event) => delete event.issue.number, "INVALID_ISSUE_NUMBER"],
+  ["geschlossenes Issue", (event) => (event.issue.state = "closed"), "ISSUE_NOT_OPEN"],
   ["fehlender Body", (event) => delete event.issue.body, "INVALID_ISSUE_BODY"],
   ["fremdes Repository", (event) => (event.repository.full_name = "other/repo"), "REPOSITORY_MISMATCH"],
   ["ungültiger Label-Akteur", (event) => (event.sender.login = "../actor"), "INVALID_EVENT_LOGIN"],
@@ -164,6 +166,33 @@ test("prepare-import bricht vor der Generierung bei falschem Label ab", async ()
       (error) => error.code === "INVALID_IMPORT_LABEL"
     );
     await assert.rejects(readFile(outputPath, "utf8"), { code: "ENOENT" });
+    await assert.rejects(readFile(path.join(workspace, "prompts"), "utf8"), { code: "ENOENT" });
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test("prepare-import kann den validierten Plan ohne Dateischreibzugriff ausgeben", async () => {
+  const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), "kitomat-import-plan-only-"));
+  const workspace = path.join(temporaryRoot, "workspace");
+  const runnerTemp = path.join(temporaryRoot, "runner");
+  const eventPath = path.join(temporaryRoot, "event.json");
+  const outputPath = path.join(temporaryRoot, "github-output.txt");
+
+  try {
+    await writeFile(eventPath, JSON.stringify(await validEvent()), "utf8");
+    await Promise.all([mkdir(workspace), mkdir(runnerTemp)]);
+    const result = await prepareImport({
+      GITHUB_EVENT_PATH: eventPath,
+      GITHUB_REPOSITORY: "ki-tomat/kitomat-ap14-gate",
+      GITHUB_OUTPUT: outputPath,
+      GITHUB_WORKSPACE: workspace,
+      KITOMAT_PLAN_ONLY: "true",
+      RUNNER_TEMP: runnerTemp
+    });
+
+    assert.equal(result.generated, false);
+    assert.match(await readFile(outputPath, "utf8"), /manifest_sha256=[a-f0-9]{64}\n/u);
     await assert.rejects(readFile(path.join(workspace, "prompts"), "utf8"), { code: "ENOENT" });
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
