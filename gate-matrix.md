@@ -102,7 +102,7 @@ Die folgenden Erwartungen beschreiben das Zielverhalten für ein späteres `WEG_
 
 Damit sind die No-op- und Concurrency-Erwartungen belegt. Die kontrollierte Aktualisierung eines offenen PR sowie die Sperre nach geschlossenem PR müssen vor `WEG_A_GO` implementiert und erneut live geprüft werden. Der Fall „zugeordneter PR gemergt“ bleibt bis zu einem regulären Merge offen.
 
-**Live-Ergebnis des ersten Wiederholungstests vom 15. September 2026: fail-closed bestanden.** Am unveränderten synthetischen Issue [#1](https://github.com/ki-tomat/kitomat-ap14-gate/issues/1) wurde das Label `webui-import` entfernt und bei identischem Payload sowie identischem Hash erneut gesetzt. Der zweite Importlauf [#34943076046](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34943076046) stoppte erwartungsgemäß im Schritt „Vorhandene Import-Branch-Familie ausschließen“ mit dem Hinweis, dass für diese Artefakt-ID bereits eine Import-Branch existiert.
+**Live-Ergebnis des ersten Wiederholungstests vom 15. September 2026: sicher blockiert, Zielverhalten noch nicht erfüllt.** Am unveränderten synthetischen Issue [#1](https://github.com/ki-tomat/kitomat-ap14-gate/issues/1) wurde das Label `webui-import` entfernt und bei identischem Payload sowie identischem Hash erneut gesetzt. Der zweite Importlauf [#34943076046](https://github.com/ki-tomat/kitomat-ap14-gate/actions/runs/34943076046) stoppte im Schritt „Vorhandene Import-Branch-Familie ausschließen“ mit dem Hinweis, dass für diese Artefakt-ID bereits eine Import-Branch existiert. Damit entstanden zwar weder ein zweiter PR noch ein unnötiger Commit, der vertraglich geforderte erfolgreiche No-op mit Link auf den vorhandenen PR wurde jedoch nicht erreicht.
 
 Die nachfolgenden Schritte für Validatoren, Commit, Pull-Request-Erstellung und Issue-Verknüpfung wurden übersprungen. Der Workflow hinterließ im Issue ausschließlich den generischen sicheren Abbruchkommentar mit Lauf-Link. Es entstand kein zusätzlicher Branch, Commit oder Pull Request: Pull Request [#2](https://github.com/ki-tomat/kitomat-ap14-gate/pull/2) enthielt danach weiterhin genau den ursprünglichen Commit `dc820e499945e2c30d5576f5210b512a3cb283e4`; im Repository blieben insgesamt die zwei bereits vorhandenen offenen Pull Requests #2 und #3 bestehen.
 
@@ -203,6 +203,8 @@ Nur wenn alle folgenden Aussagen belegt sind:
 ### `WEG_A_NO_GO`
 
 Sobald einer dieser Punkte nicht zuverlässig nachweisbar ist. In diesem Fall bleibt `WEG_A_AKTIV = false`; Weg B wird unabhängig fortgesetzt.
+
+**Aktuelle Gate-Entscheidung vom 23. September 2026: `WEG_A_NO_GO`.** Die Sicherheits- und Happy-Path-Nachweise sind weitgehend grün, aber das verbindliche Wiederanlaufverhalten ist noch nicht vollständig umgesetzt: gleicher Hash liefert keinen regulären No-op, ein geänderter Hash aktualisiert den offenen PR nicht, und ein geschlossenes Issue konnte erneut einen PR erzeugen. Zusätzlich fehlen die AP14-Browser-Testseite samt Chrome-/Edge-/Firefox-Matrix sowie der Fehlerpfad zwischen Branch-Push und PR-Erstellung. `WEG_A_AKTIV` muss daher vorerst `false` bleiben. Nach Implementierung und grüner Wiederholung dieser Punkte kann die Entscheidung neu getroffen werden.
 
 ## I. Noch zu entscheidende Policy-Frage
 
