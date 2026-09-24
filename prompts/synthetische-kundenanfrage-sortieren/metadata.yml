@@ -21,4 +21,4 @@ required_inputs:
   - "Eine Liste der erlaubten Themenkategorien"
 output_format: "Markdown-Tabelle mit Kategorie, Dringlichkeit, Begründung und Rückfragebedarf"
 personal_data_possible: false
-evaluation_criteria: "Alle Ausgaben müssen nachvollziehbar sein, Unsicherheit kennzeichnen und dürfen keine echte Priorisierungsentscheidung vortäuschen."
+evaluation_criteria: "Alle Ausgaben müssen nachvollziehbar sein, Unsicherheit kennzeichnen und dürfen keine echte Priorisierungsentscheidung vortäuschen. AP14-Live-Update-Test."
