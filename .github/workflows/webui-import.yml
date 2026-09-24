@@ -149,6 +149,14 @@ jobs:
             esac
           done < <(git diff --name-only origin/main...HEAD)
 
+          # Legacy-Artefaktbranches koennen vor der aktuellen Workflow-Laufzeit
+          # entstanden sein. Die Laufzeit wird nur in den Arbeitsbaum geholt und
+          # spaeter bewusst nicht gestaged; der Commit bleibt auf ARTIFACT_PATH
+          # begrenzt.
+          git restore --source=origin/main --worktree -- \
+            scripts src tools package.json package-lock.json
+          test -f scripts/generate-import-artifact.mjs
+
           git rm -r -- "$ARTIFACT_PATH"
 
       - name: Artefakt für neuen oder aktualisierten Import erzeugen
