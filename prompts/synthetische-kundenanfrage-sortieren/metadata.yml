@@ -1,0 +1,24 @@
+id: "synthetische-kundenanfrage-sortieren"
+artifact_type: "prompt_package"
+title: "Synthetische Kundenanfragen für ein kleines Serviceteam sortieren"
+category: "customer_service"
+status: "draft"
+language: "de"
+version: "0.1.0"
+maintainer: "ap14-test-user"
+license: "CC-BY-4.0"
+license_status: "declared"
+data_risk: "green"
+human_review_required: true
+ai_act_proximity: "none"
+legal_disclaimer: "Arbeits- und Orientierungshilfe. Keine Rechtsberatung, kein Audit, kein produktives Entscheidungswerkzeug."
+sources_status: "not_required"
+target_users:
+  - "Mitarbeitende kleiner Serviceteams ohne Programmierkenntnisse"
+use_case: "Frei erfundene Kundenanfragen nach Thema und Dringlichkeit vorsortieren, ohne Entscheidungen über reale Personen zu treffen."
+required_inputs:
+  - "Eine vollständig synthetische Anfrage"
+  - "Eine Liste der erlaubten Themenkategorien"
+output_format: "Markdown-Tabelle mit Kategorie, Dringlichkeit, Begründung und Rückfragebedarf"
+personal_data_possible: false
+evaluation_criteria: "Alle Ausgaben müssen nachvollziehbar sein, Unsicherheit kennzeichnen und dürfen keine echte Priorisierungsentscheidung vortäuschen. AP14-Live-Update-Test."
